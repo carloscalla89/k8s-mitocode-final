@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-petclinic
+  labels:
+    app: api-petclinic
+    version: v1
+spec:
+  selector: #permite seleccionar un conjunto de objetos que cumplan las condiciones
+    matchLabels:
+      app: api-petclinic
+      version: v1
+  replicas: 4 #replicaset
+  strategy:
+    type: RollingUpdate # otro valor ->  Recreate (evita que el controlador actualice de forma automática)
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template: # Plantilla que define los containers
+    metadata:
+      labels:
+        app: api-petclinic
+        version: v1
+    spec:
+      containers:
+        - name: api-petclinic 
+          image: carlos89/app-petclinic-curso-k8s:v1
+          imagePullPolicy: Always
+          ports:
+              - containerPort: 8080
+          env:
+          - name: MYSQL_URL
+            value: jdbc:mysql://mysql-0.mysql/petclinic #
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "10m"
+            limits:
+              memory: "1Gi"
+              cpu: "1"
+          readinessProbe:
+            httpGet:
+              # path: /status/verificar
+              path: /
+              port: 8080
+            periodSeconds: 3
+            timeoutSeconds: 2
