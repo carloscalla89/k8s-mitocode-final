@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-cip
+  namespace: name1
+  labels:
+    tier: data
+    app: mysql
+spec:
+  selector: #permite seleccionar un conjunto de objetos que cumplan las condiciones
+    matchLabels:
+      app: mysql-cip
+      tier: data
+  replicas: 1 #replicaset
+  template: # Plantilla que define los containers
+    metadata:
+      labels:
+        app: mysql-cip
+        tier: data
+    spec:
+      containers:
+        - name: mysql-cip
+          image: carlos89/mysql-server:v1
+          ports:
+              - containerPort: 3306
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-svc
+  namespace: name1
+spec:
+  type: ClusterIP
+  selector:
+    app: mysql-cip
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306
+
+# <name>.<namespace>.svc.cluster.local
+# mysql-svc.app.svc.cluster.local
+# mysql-svc

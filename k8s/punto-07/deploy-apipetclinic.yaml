@@ -28,9 +28,12 @@ spec:
           imagePullPolicy: Always
           ports:
               - containerPort: 8080
-          env:
-          - name: MYSQL_URL
-            value: jdbc:mysql://mysql-0.mysql/petclinic #
+          envFrom:
+          - secretRef:
+                 name: secreto1
+#          env:
+#          - name: MYSQL_URL
+#            value: jdbc:mysql://mysql-0.mysql/petclinic #
           resources:
             requests:
               memory: "64Mi"
